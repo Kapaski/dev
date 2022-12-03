@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-const priority = Array.from('0abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+const priority = Array.from('0abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 var output = fs.readFileSync('input.txt').toString().split(/\r?\n/);
 let all = 0;
 let counter = 0;
