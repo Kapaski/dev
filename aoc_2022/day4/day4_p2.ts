@@ -11,7 +11,7 @@ output.forEach(pair => {
     sorted.sort((a,b) => 
       Number(a) > Number(b) ? 1 : -1
     )
-    if((e1l == sorted[0] && e1r == sorted[3]) || (e2l == sorted[0] && e2r == sorted[3]) ) {
+    if((Number(e1l) <= Number(e2r) && Number(e1r) >= Number(e2l)) || (Number(e2l) <= Number(e1r) && Number(e2r) >= Number(e1l))) {
       console.log('contains pair ', sorted)
       counter += 1
     }
