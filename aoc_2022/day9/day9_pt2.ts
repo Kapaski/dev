@@ -39,20 +39,20 @@ const checkHead = (cHead: coord, cTail:coord, forTail: number, dir: string): [ne
     }
     
     //all chase diagnal
-    if(includeCoord([ [upright[0]+1, upright[1] ], [upright[0], upright[1]+1] ], cHead)){
-      if (forTail == 9) { console.log('move chase upright ', upright, 'for ', forTail) }
+    if(includeCoord([ [upright[0]+1, upright[1] ], [upright[0], upright[1]+1], [upright[0]+1, upright[1]+1]], cHead)){
+      if (forTail == 1) { console.log('move chase upright ', upright, 'for ', forTail) }
       return [ <coord>upright, true, 'UR' ]
     } 
-    if(includeCoord([ [upleft[0]-1, upleft[1] ], [upleft[0], upleft[1]+1] ], cHead)){
-      if (forTail == 9) { console.log('move chase upleft ', upleft, 'for ', forTail) }
+    if(includeCoord([ [upleft[0]-1, upleft[1] ], [upleft[0], upleft[1]+1], [upleft[0]-1, upleft[1]+1] ], cHead)){
+      if (forTail == 1) { console.log('move chase upleft ', upleft, 'for ', forTail) }
       return [ <coord>upleft, true, 'UL' ]
     } 
-    if(includeCoord([ [downright[0]+1, downright[1] ], [downright[0], downright[1]-1] ], cHead)){
-      if (forTail == 9) { console.log('move chase downright ', downright, 'for ', forTail) }
+    if(includeCoord([ [downright[0]+1, downright[1] ], [downright[0], downright[1]-1], [downright[0]+1, downright[1]-1] ], cHead)){
+      if (forTail == 1) { console.log('move chase downright ', downright, 'for ', forTail) }
       return [ <coord>downright, true, 'DR' ]
     } 
-    if(includeCoord([ [downleft[0]-1, downleft[1] ], [downleft[0], downleft[1]-1] ], cHead)){
-      if (forTail == 9) { console.log('move chase downleft ', downleft, 'for ', forTail) }
+    if(includeCoord([ [downleft[0]-1, downleft[1] ], [downleft[0], downleft[1]-1], [downleft[0]-1, downleft[1]-1] ], cHead)){
+      if (forTail == 1) { console.log('move chase downleft ', downleft, 'for ', forTail) }
       return [ <coord>downleft, true, 'DL' ]
     }
 
@@ -60,43 +60,24 @@ const checkHead = (cHead: coord, cTail:coord, forTail: number, dir: string): [ne
     // all straight 
     if(includeCoord([ [up[0], up[1]+1 ] ], cHead)){
 
-      if (forTail == 9) { console.log('move chase up ', up, 'for ', forTail) }
+      if (forTail == 1) { console.log('move chase up ', up, 'for ', forTail) }
       return [ <coord>up, false, 'NA' ]
     }
     if(includeCoord([ [down[0], down[1]-1 ] ], cHead)){
-      if (forTail == 9) { console.log('move chase down ', down, 'for ', forTail) }
+      if (forTail == 1) { console.log('move chase down ', down, 'for ', forTail) }
       return [ <coord>down, false, 'NA' ]
     }
     if(includeCoord([ [right[0]+1, right[1] ] ], cHead)){
-      if (forTail == 9) { console.log('move chase right ', right, 'for ', forTail) }
+      if (forTail == 1) { console.log('move chase right ', right, 'for ', forTail) }
       
       return [ <coord>right, false, 'NA' ]
     }
     if(includeCoord([ [left[0]-1, left[1] ] ], cHead)){
-      if (forTail == 9) { console.log('move chase left ', left, 'for ', forTail) }
+      if (forTail == 1) { console.log('move chase left ', left, 'for ', forTail) }
       return [ <coord>left, false, 'NA' ]
     } 
-    // immediate parent one moves to follow diagnally moved grantparent
-    // move up/down/right/left + 1 step to search it
     
-    if (includeCoord([[upright[0]+1, upright[1]+1]], cHead)) {
-      if (forTail == 9) { console.log('move chase d upright ', upright, 'for ', forTail) }
-      return [ <coord>upright, true, 'NA' ]
-    }
-    if (includeCoord([[upleft[0]-1, upleft[1]+1]], cHead)) {
-      if (forTail == 9) { console.log('move chase d upleft ', upleft, 'for ', forTail) }
-      return [ <coord>upleft, true, 'NA' ]
-    }
-    if (includeCoord([[downright[0]+1, downright[1]-1]], cHead)) {
-      if (forTail == 9) { console.log('move chase d downright ', downright, 'for ', forTail) }
-      return [ <coord>downright, true, 'NA' ]
-    }
-    if (includeCoord([[downleft[0]-1, downleft[1]-1]], cHead)) {
-      if (forTail == 9) { console.log('move chase d downleft ', downleft, 'for ', forTail) }
-      return [ <coord>downleft, true, 'NA' ]
-    }
-    if (forTail == 9) { console.log('shouldn/t reach ', cHead, cTail, 'for ', forTail) }
-    //console.log('shouldnt reach here', cHead, cTail)
+    console.log('shouldnt reach here', cHead, cTail)
   }
   
   return [ cTail, false, 'NA' ]
@@ -110,26 +91,24 @@ for(const move of moves) {
   //move to direction
   console.log(`doing - ${steps} with ${d}, totalSteps${overallsteps}, rope.length${rope[9].length}`)
   for(let k=overallsteps; k<steps+overallsteps; k++) {
-    
-    let currentJ = 0;
-    
     for(let j = 0; j < lengthOfRope - 1; j++) { // each rope knots
-      if (j < currentJ-1 ) {
-        console.log(`already done ${j} because of ${currentJ}`)
-        continue
-      }
-      const newHeadCoord = <coord>[...rope[j][k]]
+      const forTailKnot = (j+1)
+      let newHeadCoord = <coord>[...rope[j][k]]
+      
       if (j == 0) {
+        
         newHeadCoord[moveDir[0]] += moveDir[1]
         rope[j].push(newHeadCoord)
+        
+      } else {
+        newHeadCoord = <coord>[...rope[j][k+1]]
       }
-      const forTailKnot = (j+1)
+      
       let currentTail = <coord>[...rope[j+1][k]]
       
       const [newKnotCoord, moveWithHead, ddir] = checkHead(newHeadCoord, currentTail, forTailKnot, d.toString())
-      if (forTailKnot >= 8){
-        console.log('for tail  ', newHeadCoord, newKnotCoord, moveWithHead)
-      }
+      
+      
       rope[j+1].push( <coord>newKnotCoord )
       
       // 
@@ -139,9 +118,6 @@ for(const move of moves) {
   } 
   overallsteps += steps    
 }
-
-//console.log(coordsHead)
-//console.log(coordsTail)
 
 const uniqueStop = new Set(rope[9].map(a => `${a[0]}_${a[1]}`))
 console.log(rope[9])
