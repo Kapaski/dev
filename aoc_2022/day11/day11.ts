@@ -40,11 +40,11 @@
       }
       calmpt2(x: number) {
         const monkeysTests = [19, 13, 5, 7, 17, 2, 3, 11]
-        let highestValue = Object.values(monkeysTests).reduce(
+        let mod = Object.values(monkeysTests).reduce(
           (acc: number, t) => (acc *= t),
           1
         );
-        return x%highestValue;
+        return x%mod;
       }
     
       throwTo(item: number): number { 
