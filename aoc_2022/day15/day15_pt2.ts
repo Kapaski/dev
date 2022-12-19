@@ -16,74 +16,89 @@ inputs.forEach(line => {
     if(nLoc.length == 4) { 
       locs.push([nLoc[0], nLoc[1], nLoc[2], nLoc[3]]) 
     }
-    const xl = Math.min(nLoc[0], nLoc[2])
-    const xg = Math.max(nLoc[0], nLoc[2])
-    const yl = Math.min(nLoc[1], nLoc[3])
-    const yg = Math.max(nLoc[1], nLoc[3])
-    if (xl < xEdges[0]) { xEdges[0] =  xl}
-    if (xg > xEdges[1]) { xEdges[1] = xg  }
-    if (yl < yEdges[0]) { yEdges[0] = yl}
-    if (yg > yEdges[1]) { yEdges[1] = yg }
-    if (sensors[nLoc[1]]) {
-      if (!sensors[nLoc[1]].some(v => v === nLoc[0])) {
-        sensors[nLoc[1]].push(nLoc[0])
-      }
-    } else {
-      sensors[nLoc[1]] = [nLoc[0]]
-    }
-    if (beacons[nLoc[3]]) {
-      if (!beacons[nLoc[3]].some(v => v === nLoc[2])) {
-        beacons[nLoc[3]].push(nLoc[2])
-      }
-    } else {
-      beacons[nLoc[3]] = [nLoc[2]]
-    }
-    
   }
 })
 // edge values based on coords
 //console.log(locs)
 //console.log(xEdges, yEdges)
-
-// hi Hermann Minkowski
-const dist = (sx: number, sy: number, bx: number, by: number) => Math.abs(bx-sx) + Math.abs(by - sy)
-let maxy = 4_000_000
-let maxx = 4_000_000
-let found: Set<number> = new Set()
-for (let y = 0; y <= maxy; y++) { // every row
-  const coverY: Set<number> = new Set()
-  locs.forEach((loc, idx) => { // every sensor's coverage to row
-    const reach = dist(...loc)
-    const up = loc[1] - reach
-    const down = loc[1] + reach
-   
-    if ((loc[1] < y && down  < y ) || (loc[1] > y && up > y )) {
+const max = 4000000//20
+const distance = (sx: number, sy: number, bx: number, by: number) => Math.abs(bx-sx) + Math.abs(by - sy)
+const outter = (sx: number, sy: number, bx: number, by: number) => {
+  const dist =  distance(sx, sy, bx, by)+ 1
+  const upMost = [sx, sy - dist]
+  const downMost = [sx, dist + dist]
+  let found: number[] = []
+  let uplx = upMost[0]
+  let uprx = upMost[0]
+  for ( let l = 1; l <= dist; l ++) {
+    if(found.length>0) {
       return
-    } else {
-      
-      const toY = Math.abs(loc[1] - y)
-      //console.log(loc, ' can cover the given y  ', y, ' with ', reach, ' toY ', toY)
-    
-      // from sensor's Y, every next row is 2 squares less than previous, symmetrically
-      const cover = (reach - toY)
-      const lx = loc[0] - cover > 0 ? loc[0] - cover : 0
-      const rx = loc[0] + cover > maxx ? maxx : loc[0] + cover
-      //console.log('row', y, 'LR:', lx, rx, '[',loc[0], loc[1], '] - ', cover)
-      for(let r = lx; r <= rx; r++) {
-        coverY.add(r)
+    }
+    uplx -= 1
+    uprx += 1
+    let isit = inOthers(uplx, upMost[1] + l, sx, sy)
+    if(isit) {
+      found = isit
+      break
+    }
+    isit = inOthers(uprx, upMost[1] + l, sx, sy)
+    if(isit) {
+      found = isit
+      break
+    }
+  }
+  let downlx = downMost[0]
+  let downrx = downMost[0]
+  if (!found) {
+    downlx -= 1
+    downrx += 1
+    for ( let l = 1; l < dist; l ++) {
+      let isit = inOthers(downlx, downMost[1] - l, sx, sy)
+      if(isit) {
+        found = isit
+        break
+      }
+      isit = inOthers(downrx, upMost[1] + l, sx, sy)
+      if(isit) {
+        found = isit
+        break
       }
     }
-  })
-  if (coverY.size < (maxx+1)) {
-    console.log(`found ${found} at row ${y}`)
-    found = coverY
-    break
   }
+  
+  return found
 }
 
-// part 2
-let all = 4_000_001 / 2 * 4_000_000 //sum(0, 20)
-console.log(all - Array.from(found).reduce((a,b) => a+b))
+const inOthers = (x: number, y: number, sx: number, sy: number) => {
+  let reachOtherSensors = false
+  locs.forEach((loc, idx) => { // every sensor's coverage to row
+    if( loc[0] == sx && loc[1] == sy) {
+      //console.log('not checking self ', loc)
+      return //skip checking self
+    }
+    const distance1 = distance(...loc) // other sensor's reach
+    const distance2 = distance(x, y, loc[0] ,loc[1]) // this to other sensor
+    if (distance2 <= distance1 ) {
+      reachOtherSensors = true
+      return
+    }  
+  })
+  if(!reachOtherSensors) {
+    if (x <= max && y <= max && x >= 0 && y >= 0) {
+      
+      console.log(`not reachOtherSensors , ${x},${y}`)
+      return [x, y]
+    }
+    
+  }
+  return undefined
+}
 
-
-
+  
+locs.forEach((loc, idx) => {
+  const run = outter(...loc)
+  if(run && run.length > 0) {
+    console.log(run[0] * 4000000 + run[1])
+    return 
+  }
+})
